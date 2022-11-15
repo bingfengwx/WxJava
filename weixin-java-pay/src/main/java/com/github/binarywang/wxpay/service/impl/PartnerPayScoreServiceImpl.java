@@ -10,6 +10,7 @@ import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.PartnerPayScoreService;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.v3.util.AesUtils;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,8 +39,12 @@ public class PartnerPayScoreServiceImpl implements PartnerPayScoreService {
   @Override
   public WxPartnerPayScoreResult permissions(WxPartnerPayScoreRequest request) throws WxPayException {
     String url = this.payService.getPayBaseUrl() + "/v3/payscore/partner/permissions";
-    request.setAppid(request.getAppid());
-    request.setServiceId(request.getServiceId());
+    if (Strings.isNullOrEmpty(request.getAppid())) {
+      request.setAppid(payService.getConfig().getAppId());
+    }
+    if (Strings.isNullOrEmpty(request.getServiceId())) {
+      request.setServiceId(payService.getConfig().getServiceId());
+    }
     WxPayConfig config = this.payService.getConfig();
     String permissionNotifyUrl = config.getPayScorePermissionNotifyUrl();
     if (StringUtils.isBlank(permissionNotifyUrl)) {
